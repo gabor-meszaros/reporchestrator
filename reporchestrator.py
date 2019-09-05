@@ -30,11 +30,10 @@ for day_offset in range(0, REPO_AGE_IN_DAYS):
                            + (hour_offset * SECONDS_PER_HOUR)
         date = strftime("%Y-%m-%dT%H:%M:%S", gmtime(unformatted_date))
         index = repo.index
-        author = Actor(ACTOR_NAME, ACTOR_EMAIL)
-        committer = Actor(ACTOR_NAME, ACTOR_EMAIL)
+        developer = Actor(ACTOR_NAME, ACTOR_EMAIL)
         ticket_reference = branch_ticket if branch_ticket is not None else ""
         message = "{} {}".format(ticket_reference, GENERAL_COMMIT_MESSAGE)
-        index.commit(message, author=author, committer=committer,
+        index.commit(message, author=developer, committer=developer,
                      author_date=date, commit_date=date)
         if (branch_ticket is not None) and (hour_offset == LAST_HOUR_INDEX):
             master = repo.heads.master
@@ -44,7 +43,7 @@ for day_offset in range(0, REPO_AGE_IN_DAYS):
             message = "{} {}".format(branch_ticket, MERGE_COMMIT_MESSAGE)
             repo.index.commit(message, parent_commits=(master.commit,
                                                        branch.commit),
-                              head=True, author=author, committer=committer,
+                              head=True, author=developer, committer=developer,
                               author_date=date, commit_date=date)
             master.commit = repo.head.commit
             repo.head.reference = master
