@@ -11,8 +11,10 @@ SECONDS_PER_HOUR = 3600
 HOURS_PER_DAY = 24
 LAST_HOUR_INDEX = HOURS_PER_DAY - 1
 
-ACTOR_NAME = "John Doe"
-ACTOR_EMAIL = "john-doe@users.noreply.github.com"
+DEVELOPERS = [ Actor("John Doe", "john-doe@users.noreply.github.com"),
+               Actor("Jane Doe", "jane-doe@users.noreply.github.com"),
+               Actor("Max Mustermann",
+                     "max-mustermann@users.noreply.github.com") ]
 
 GENERAL_COMMIT_MESSAGE = "Add an empty change"
 MERGE_COMMIT_MESSAGE = "Introduce the feature"
@@ -23,6 +25,7 @@ rmtree(REPO_DIR, ignore_errors=True)
 repo = Repo.init(REPO_DIR)
 first_commit_time = timegm(gmtime()) - (REPO_AGE_IN_DAYS * SECONDS_PER_DAY)
 branch_ticket = None
+branch_developer = 0
 
 for day_offset in range(0, REPO_AGE_IN_DAYS):
     for hour_offset in range(0, HOURS_PER_DAY):
@@ -30,11 +33,10 @@ for day_offset in range(0, REPO_AGE_IN_DAYS):
                            + (hour_offset * SECONDS_PER_HOUR)
         date = strftime("%Y-%m-%dT%H:%M:%S", gmtime(unformatted_date))
         index = repo.index
-        author = Actor(ACTOR_NAME, ACTOR_EMAIL)
-        committer = Actor(ACTOR_NAME, ACTOR_EMAIL)
+        developer = DEVELOPERS[branch_developer]
         ticket_reference = branch_ticket if branch_ticket is not None else ""
         message = "{} {}".format(ticket_reference, GENERAL_COMMIT_MESSAGE)
-        index.commit(message, author=author, committer=committer,
+        index.commit(message, author=developer, committer=developer,
                      author_date=date, commit_date=date)
         if (branch_ticket is not None) and (hour_offset == LAST_HOUR_INDEX):
             master = repo.heads.master
@@ -44,7 +46,7 @@ for day_offset in range(0, REPO_AGE_IN_DAYS):
             message = "{} {}".format(branch_ticket, MERGE_COMMIT_MESSAGE)
             repo.index.commit(message, parent_commits=(master.commit,
                                                        branch.commit),
-                              head=True, author=author, committer=committer,
+                              head=True, author=developer, committer=developer,
                               author_date=date, commit_date=date)
             master.commit = repo.head.commit
             repo.head.reference = master
@@ -52,6 +54,7 @@ for day_offset in range(0, REPO_AGE_IN_DAYS):
             branch_ticket = None
         if (branch_ticket is None) and (day_offset != REPO_AGE_IN_DAYS - 1):
             branch_ticket = "ACME-" + str(randint(1, REPO_AGE_IN_DAYS))
+            branch_developer = (branch_developer + 1) % len(DEVELOPERS)
             branch = repo.create_head(branch_ticket)
             repo.head.reference = branch
             repo.head.reset(index=True, working_tree=True)
