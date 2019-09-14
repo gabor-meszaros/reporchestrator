@@ -21,19 +21,17 @@ def test_periodic_commit():
 def test_next_member():
     c = {"developers": ["a", "b"], "developer_strategy": "round-robin"}
     gen = reporchestrator.next_member(c)
-    m = next(gen)
-    assert m == "a"
-    m = next(gen)
-    assert m == "b"
-    m = next(gen)
-    assert m == "a"
+    round_robin = ["a", "b"] * 3
+    robin = [next(gen) for _ in round_robin]
+    assert robin == round_robin
 
 
 def test_next_member_random_uniform():
     c = {"developers": ["a", "b"], "developer_strategy": "random-uniform"}
     gen = reporchestrator.next_member(c)
-    m = next(gen)
-    assert m in ("a", "b")
+    seeded_uniform = ['a', 'a', 'b', 'a', 'a', 'a']
+    uniform = [next(gen) for _ in seeded_uniform]
+    assert uniform == seeded_uniform
 
 
 def test_commit_datetime_string_gen():
@@ -169,18 +167,3 @@ def test_groom_model():
     assert m.is_consistent()
     assert m.commits == 0
     assert m.ticket is None  # Important as this triggers feature planning
-
-
-@mock.patch('shutil.rmtree')
-@mock.patch('git.Repo.init')
-def test_repo_init(ri_mock, rm_mock):  # left corresponds to outer
-    a_dir = "foo"
-    rm_mock.return_value = 'REMOVED'
-    ri_mock.return_value = 'SUCCESS'
-
-    reporchestrator.create_repository({"repo_dir": a_dir})
-
-    rm_mock.assert_called_with(a_dir, ignore_errors=True)
-    assert rm_mock.return_value == 'REMOVED'
-    ri_mock.assert_called_with(a_dir)
-    assert ri_mock.return_value == 'SUCCESS'

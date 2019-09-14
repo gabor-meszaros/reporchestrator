@@ -102,13 +102,19 @@ def defaults(argv=None):
     mixin_cfg = mixin(argv)
     cfg = {**default_cfg, **mixin_cfg}
 
+    if not cfg.get("repo_dir"):
+        raise ValueError("empty repo_dir, no implicit current working dir use")
+
     cfg = activate_model(cfg)
     cfg = seed_model(cfg)
 
-    cfg["developer_data"] = [
-        (cfg["fake"].name(), cfg["fake"].email()) for _ in range(cfg["team_size"])
-    ]
-    cfg["developers"] = pairs_to_actors(cfg["developer_data"])
+    if not cfg.get("developers"):
+        if not cfg.get("developer_data"):
+            cfg["developer_data"] = [
+                (cfg["fake"].name(), cfg["fake"].email())
+                for _ in range(cfg["team_size"])
+            ]
+        cfg["developers"] = pairs_to_actors(cfg["developer_data"])
 
     if cfg["developer_strategy"] not in DEVELOPER_STRATEGIES:
         raise ValueError(

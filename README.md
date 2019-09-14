@@ -70,6 +70,9 @@ viewed like so (example data from a random run):
  'ticket_id_template': 'ACME-%d'}
 ```
 
+Note: Interesting changes may happen, when pointing the `repo_dir` 
+value to this repository folder, just sayin' you have been warned ... 
+
 ## Dependencies
 
 This tool depends on the non-standard library python modules 
@@ -94,7 +97,7 @@ satisfies all of the following 4 criteria:
 1. `black reporchestrator.py` succeeded
 2. `pylint reporchestrator.py` ideally 10.0/10.0 score
 3. `pytest` has no failing test
-4. `pytest --cov-report term --cov=reporchestrator tests/` should report 80% coverage or more (especially if new features were added)
+4. `pytest --cov-report term --cov-branch --cov=reporchestrator tests/` should report 80% coverage or more (especially if new features were added)
 
 Thank you.
 
