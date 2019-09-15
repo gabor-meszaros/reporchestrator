@@ -1,0 +1,12 @@
+{
+    "random_seed": 22,
+    "repo_age_in_days": 10,
+    "team_size": 5,
+    "general_commit_words": ["Add", "an", "empty", "change"],
+    "merge_commit_words": ["Introduce", "the", "feature"],
+    "max_commits_per_branch": 10,
+    "repo_dir": "repository",
+    "datetime_format_template": "%Y-%m-%dT%H:%M:%S",
+    "ticket_id_template": "ACME-%d",
+    "message_template": "%s %s"
+}
